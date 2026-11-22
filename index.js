@@ -144,7 +144,7 @@ const Preloader = /** @constructor */ function () { // eslint-disable-line no-un
 		};
 		const isEngine = file.endsWith('.wasm');
 const asset = isEngine ? file + '.gz' : file;
-return fetch(asset + '?v=5f4bd092c239').then(function (response) {
+return fetch(asset + '?v=89f0c03c6d15').then(function (response) {
   if (!isEngine || !response.ok) return response;
   if (typeof DecompressionStream === 'undefined') {
     throw new Error('Update your browser to play this game.');
