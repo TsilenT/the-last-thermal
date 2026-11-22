@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A short walk along a coastal headland to finish a seabird count.">
+  <meta name="theme-color" content="#102321">
+  <title>The Last Thermal</title>
+  <link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #102321; color: #f7eed6; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+    canvas { display: block; outline: none; touch-action: none; }
+    .cover {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      align-items: center;
+      padding: clamp(1.5rem, 8vw, 8rem);
+      background: linear-gradient(90deg, #081a18 0%, #0b201be8 21%, #142c2599 61%, #10232144 100%),
+        #213b36 url("cover.png") center / cover;
+    }
+    .cover[hidden] { display: none; }
+    .panel { max-width: 38rem; padding: 1rem 0; }
+    h1 { margin: 0; max-width: 9ch; font: 400 clamp(3.3rem, 9vw, 8rem) / .97 Georgia, serif; letter-spacing: -.055em; }
+    p { max-width: 32ch; margin: 1.5rem 0; color: #e5e3d1; line-height: 1.5; }
+    button {
+      border: 1px solid #ceb17d; border-radius: .25rem; padding: .7rem 1.25rem;
+      background: #e4c28c; color: #182721; font: 600 1rem system-ui, sans-serif; cursor: pointer;
+    }
+    button:hover { background: #f0d8ae; }
+    button:disabled { cursor: wait; opacity: .65; }
+    button:focus-visible { outline: 2px solid #fff6de; outline-offset: 5px; }
+    progress { width: min(19rem, 100%); accent-color: #e4c28c; }
+    #message { min-height: 1.5rem; margin: .75rem 0; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" tabindex="0" aria-label="The Last Thermal game">Your browser requires canvas support.</canvas>
+  <div class="cover" id="cover">
+    <main class="panel">
+      <h1>The Last Thermal</h1>
+      <p>Follow the coast to finish Mara’s seabird count.</p>
+      <button id="play" type="button" disabled>Play in browser</button>
+      <progress id="progress" aria-label="Loading the game" hidden></progress>
+      <p id="message" role="status" aria-live="polite"></p>
+      <noscript>Enable JavaScript to play.</noscript>
+    </main>
+  </div>
+  <script src="index.js"></script>
+  <script>
+    const config = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":3232500,"index.wasm":37700666},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+    const threads = false;
+    const cover = document.getElementById("cover");
+    const play = document.getElementById("play");
+    const progress = document.getElementById("progress");
+    const message = document.getElementById("message");
+    const canvas = document.getElementById("canvas");
+
+    play.addEventListener("click", async () => {
+      play.hidden = true;
+      progress.hidden = false;
+      message.textContent = "Loading the headland…";
+      try {
+        const missing = Engine.getMissingFeatures({ threads });
+        if (missing.length) throw new Error("This browser needs " + missing.join(", ") + " to run the game.");
+        const engine = new Engine(config);
+        await engine.startGame({
+          onProgress(current, total) {
+            if (total > 0) {
+              progress.max = total;
+              progress.value = current;
+            }
+          }
+        });
+        cover.hidden = true;
+        canvas.focus();
+      } catch (error) {
+        progress.hidden = true;
+        message.textContent = error.message || "The game could not start. Reload this page and try again.";
+        console.error(error);
+      }
+    }, { once: true });
+    play.disabled = false;
+  </script>
+</body>
+</html>
+
